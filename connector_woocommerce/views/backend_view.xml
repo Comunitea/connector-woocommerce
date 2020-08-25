@@ -22,11 +22,11 @@
               type="object" name="test_connection" />
           </header>
           <sheet>
-            <label string="Name" />
+            <label for="name" string="Name" />
             <h1>
               <field name="name" required="1" />
             </h1>
-            <group name="WooCommerce" string="WooCommerce Configuration">
+            <group string="WooCommerce Configuration">
               <field name="location" required="1" />
               <field name="consumer_key" required="1" />
               <field name="consumer_secret" required="1" />
@@ -34,28 +34,28 @@
               <field name="verify_ssl" />
               <field name="default_lang_id" />
             </group>
-            <group name="main_configuration" string="Main Configuration">
+            <group string="Main Configuration">
                 <field name="warehouse_id"/>
             </group>
             <notebook>
                 <page name="import" string="Imports">
                     <group>
-                      <label string="Import category" class="oe_inline" />
+                      <span>Import category</span>
                       <button name="import_categories" type="object" class="oe_highlight"
                         string="Import in background" />
                     </group>
                     <group>
-                      <label string="Import Product" class="oe_inline" />
+                      <span>Import Product</span>
                       <button name="import_products" type="object" class="oe_highlight"
                         string="Import in background" />
                     </group>
                     <group>
-                      <label string="Import Customers" class="oe_inline" />
+                      <span>Import Customers</span>
                       <button name="import_customers" type="object" class="oe_highlight"
                         string="Import in background" />
                     </group>
                     <group>
-                        <label string="Import Sale Orders" class="oe_inline" />
+                        <span>Import Sale Orders</span>
                         <button name="import_orders" type="object" class="oe_highlight"
                             string="Import in background" />
                     </group>
