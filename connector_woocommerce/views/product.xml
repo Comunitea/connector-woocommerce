@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_normal_form_view" model="ir.ui.view">
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="connector_base_product.product_template_common_form" />
+        <field name="arch" type="xml">
+            <page name="connector" position="attributes">
+                 <attribute name="invisible">0</attribute>
+            </page>
+            <page name="connector" position="inside">
+                 <group string="Woocommerce Bindings">
+                     <field name="woo_bind_ids"
+                            nolabel="1"/>
+                 </group>
+            </page>
+        </field>
+     </record>
+
+
+
+
+    <record id="product_connector_woo_form_view" model="ir.ui.view">
+        <field name="model">woo.product.template</field>
+        <field name="arch" type="xml">
+             <form string="woocommerce fields">
+                 <group col="1">
+                     <field name="backend_id"/>
+                     <field name="manage_stock"/>
+                     <field name="slug"/>
+                     <field name="weight"/>
+                     <field name="quantity"/>
+                 </group>
+             </form>
+        </field>
+     </record>
+
+     <record id="product_connector_woo_tree_view" model="ir.ui.view">
+         <field name="model">woo.product.template</field>
+         <field name="arch" type="xml">
+             <tree string="woocommerce product" create="0">
+                <field name="backend_id"/>
+                <field name="manage_stock"/>
+                <field name="slug"/>
+                <field name="weight"/>
+                <field name="quantity"/>
+                <button name="recompute_woocommerce_qty"
+                    class="oe_highlight"
+                    type="object"
+                    string="Export quantity"/>
+                <button name="resync"
+                    type="object"
+                    string="Resync" />
+             </tree>
+         </field>
+     </record>
+
+</odoo>

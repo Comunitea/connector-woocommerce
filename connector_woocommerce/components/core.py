@@ -11,6 +11,6 @@ class BaseWoocommerceConnectorComponent(AbstractComponent):
 
     """
 
-    _name = 'base.woocommerce.connector'
-    _inherit = 'base.connector'
-    _collection = 'wc.backend'
+    _name = "base.woocommerce.connector"
+    _inherit = "base.connector"
+    _collection = "wc.backend"

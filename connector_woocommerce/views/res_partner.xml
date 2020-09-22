@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form" model="ir.ui.view">
+        <field name="name">res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="connector.view_partner_connector_form" />
+        <field name="arch" type="xml">
+            <page name="connector" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </page>
+            <page name="connector" position="inside">
+                <group string="Woocommerce Bindings">
+                    <field  name="woo_bind_ids" nolabel="1"/>
+                </group>
+            </page>
+        </field>
+    </record>
+
+    <record id="view_woocommerce_res_partner_form" model="ir.ui.view">
+        <field name="name">woo.res.partner.form</field>
+        <field name="model">woo.res.partner</field>
+        <field name="arch" type="xml">
+            <form string="PrestaShop Partner">
+                <group>
+                    <field name="backend_id"/>
+                    <field name="external_id"/>
+                    <field name="woo_vatnumber"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_woocommerce_res_partner_tree" model="ir.ui.view">
+        <field name="name">woo.res.partner.tree</field>
+        <field name="model">woo.res.partner</field>
+        <field name="arch" type="xml">
+            <tree string="PrestaShop Partner">
+                <field name="backend_id"/>
+                <field name="external_id"/>
+                <field name="woo_vatnumber"/>
+                <button name="resync"
+                    type="object"
+                    string="Resync" />
+            </tree>
+        </field>
+    </record>
+</odoo>

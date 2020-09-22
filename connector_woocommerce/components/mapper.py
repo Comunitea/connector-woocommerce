@@ -5,15 +5,15 @@ from odoo.addons.component.core import AbstractComponent
 
 
 class WooImportMapper(AbstractComponent):
-    _name = 'woocommerce.import.mapper'
-    _inherit = ['base.import.mapper', 'base.woocommerce.connector']
-    _usage = 'import.mapper'
+    _name = "woocommerce.import.mapper"
+    _inherit = ["base.import.mapper", "base.woocommerce.connector"]
+    _usage = "import.mapper"
 
 
 class WooExportMapper(AbstractComponent):
-    _name = 'woocommerce.export.mapper'
-    _inherit = ['base.export.mapper', 'base.woocommerce.connector']
-    _usage = 'export.mapper'
+    _name = "woocommerce.export.mapper"
+    _inherit = ["base.export.mapper", "base.woocommerce.connector"]
+    _usage = "export.mapper"
 
 
 def normalize_datetime(field):
@@ -22,7 +22,8 @@ def normalize_datetime(field):
     OpenERP"""
 
     def modifier(self, record, to_attr):
-        if record[field] == '0000-00-00 00:00:00':
+        if record[field] == "0000-00-00 00:00:00":
             return None
         return record[field]
+
     return modifier

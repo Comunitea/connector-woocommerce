@@ -8,6 +8,9 @@ from odoo import fields, _
 from odoo.addons.component.core import AbstractComponent
 from odoo.addons.connector.exception import IDMissingInBackend
 from odoo.addons.queue_job.exception import NothingToDoJob
+from odoo.addons.connector_woocommerce.components.backend_adapter import (
+    WOO_DATETIME_FORMAT,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -15,9 +18,9 @@ _logger = logging.getLogger(__name__)
 class WooImporter(AbstractComponent):
     """ Base importer for WooCommerce """
 
-    _name = 'woocommerce.importer'
-    _inherit = ['base.importer', 'base.woocommerce.connector']
-    _usage = 'record.importer'
+    _name = "woocommerce.importer"
+    _inherit = ["base.importer", "base.woocommerce.connector"]
+    _usage = "record.importer"
 
     def __init__(self, work_context):
         super(WooImporter, self).__init__(work_context)
@@ -35,8 +38,6 @@ class WooImporter(AbstractComponent):
     def _is_uptodate(self, binding):
         """Return True if the import should be skipped because
         it is already up-to-date in OpenERP"""
-        WOO_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-        dt_fmt = WOO_DATETIME_FORMAT
         assert self.woo_record
         if not self.woo_record:
             return  # no update date on WooCommerce, always import it.
@@ -47,9 +48,13 @@ class WooImporter(AbstractComponent):
             return
         from_string = fields.Datetime.from_string
         sync_date = from_string(sync)
-        self.woo_record['updated_at'] = {}
-        self.woo_record['updated_at'] = {'to': datetime.now().strftime(dt_fmt)}
-        woo_date = from_string(self.woo_record['updated_at']['to'])
+        self.woo_record["updated_at"] = {}
+        self.woo_record["updated_at"] = {
+            "to": datetime.now().strftime(WOO_DATETIME_FORMAT)
+        }
+        woo_date = datetime.strptime(
+            self.woo_record["updated_at"]["to"], WOO_DATETIME_FORMAT
+        )
         # if the last synchronization date is greater than the last
         # update in woo, we skip the import.
         # Important: at the beginning of the exporters flows, we have to
@@ -58,8 +63,9 @@ class WooImporter(AbstractComponent):
         # miss changes done in WooCommerce
         return woo_date < sync_date
 
-    def _import_dependency(self, external_id, binding_model,
-                           importer=None, always=False):
+    def _import_dependency(
+        self, external_id, binding_model, importer=None, always=False
+    ):
         """ Import a dependency.
 
         The importer class is a class or subclass of
@@ -86,14 +92,16 @@ class WooImporter(AbstractComponent):
         binder = self.binder_for(binding_model)
         if always or not binder.to_internal(external_id):
             if importer is None:
-                importer = self.component(usage='record.importer',
-                                          model_name=binding_model)
+                importer = self.component(
+                    usage="record.importer", model_name=binding_model
+                )
             try:
                 importer.run(external_id)
             except NothingToDoJob:
                 _logger.info(
-                    'Dependency import of %s(%s) has been ignored.',
-                    binding_model._name, external_id
+                    "Dependency import of %s(%s) has been ignored.",
+                    binding_model._name,
+                    external_id,
                 )
 
     def _import_dependencies(self):
@@ -147,7 +155,7 @@ class WooImporter(AbstractComponent):
         self._validate_data(data)
         model = self.model.with_context(connector_no_export=True)
         binding = model.create(data)
-        _logger.debug('%d created from woo %s', binding, self.external_id)
+        _logger.debug("%d created from woo %s", binding, self.external_id)
         return binding
 
     def _update_data(self, map_record, **kwargs):
@@ -158,7 +166,7 @@ class WooImporter(AbstractComponent):
         # special check on data before import
         self._validate_data(data)
         binding.with_context(connector_no_export=True).write(data)
-        _logger.debug('%d updated from woo %s', binding, self.external_id)
+        _logger.debug("%d updated from woo %s", binding, self.external_id)
         return
 
     def _after_import(self, binding):
@@ -171,7 +179,7 @@ class WooImporter(AbstractComponent):
         :param external_id: identifier of the record on WooCommerce
         """
         self.external_id = external_id
-        lock_name = 'import({}, {}, {}, {})'.format(
+        lock_name = "import({}, {}, {}, {})".format(
             self.backend_record._name,
             self.backend_record.id,
             self.work.model_name,
@@ -181,7 +189,7 @@ class WooImporter(AbstractComponent):
         try:
             self.woo_record = self._get_woo_data()
         except IDMissingInBackend:
-            return _('Record does no longer exist in WooCommerce')
+            return _("Record does no longer exist in WooCommerce")
 
         skip = self._must_skip()
         if skip:
@@ -189,7 +197,7 @@ class WooImporter(AbstractComponent):
 
         binding = self._get_binding()
         if not force and self._is_uptodate(binding):
-            return _('Already up-to-date.')
+            return _("Already up-to-date.")
 
         # Keep a lock on this import until the transaction is committed
         # The lock is kept since we have detected that the informations
@@ -219,9 +227,9 @@ class BatchImporter(AbstractComponent):
     the import of each item separately.
     """
 
-    _name = 'woocommerce.batch.importer'
-    _inherit = ['base.importer', 'base.woocommerce.connector']
-    _usage = 'batch.importer'
+    _name = "woocommerce.batch.importer"
+    _inherit = ["base.importer", "base.woocommerce.connector"]
+    _usage = "batch.importer"
 
     def run(self, filters=None):
         """ Run the synchronization """
@@ -239,8 +247,9 @@ class BatchImporter(AbstractComponent):
 
 class DirectBatchImporter(AbstractComponent):
     """ Import the records directly, without delaying the jobs. """
-    _name = 'woocommerce.direct.batch.importer'
-    _inherit = 'woocommerce.batch.importer'
+
+    _name = "woocommerce.direct.batch.importer"
+    _inherit = "woocommerce.batch.importer"
 
     def _import_record(self, record_id):
         """ Import the record directly """
@@ -250,8 +259,8 @@ class DirectBatchImporter(AbstractComponent):
 class DelayedBatchImporter(AbstractComponent):
     """ Delay import of the records """
 
-    _name = 'woocommerce.delayed.batch.importer'
-    _inherit = 'woocommerce.batch.importer'
+    _name = "woocommerce.delayed.batch.importer"
+    _inherit = "woocommerce.batch.importer"
 
     def _import_record(self, external_id, job_options=None, **kwargs):
         """ Delay the import of the records"""

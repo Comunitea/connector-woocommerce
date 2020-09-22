@@ -40,24 +40,61 @@
             <notebook>
                 <page name="import" string="Imports">
                     <group>
-                      <span>Import category</span>
-                      <button name="import_categories" type="object" class="oe_highlight"
-                        string="Import in background" />
+                        <div>
+                            <label string="Import product categories since" class="oe_inline"
+                                for="import_product_categories_since"/>
+                            <field name="import_product_categories_since" class="oe_inline"
+                                nolabel="1" />
+                        </div>
+                        <button name="import_categories" type="object" class="oe_highlight"
+                            string="Import in background" />
                     </group>
                     <group>
-                      <span>Import Product</span>
-                      <button name="import_products" type="object" class="oe_highlight"
-                        string="Import in background" />
+                        <div>
+                            <label string="Import products since" class="oe_inline"
+                                for="import_products_since"/>
+                            <field name="import_products_since" class="oe_inline"
+                                nolabel="1" />
+                        </div>
+                        <button name="import_products" type="object" class="oe_highlight"
+                            string="Import in background" />
                     </group>
                     <group>
-                      <span>Import Customers</span>
-                      <button name="import_customers" type="object" class="oe_highlight"
-                        string="Import in background" />
+                        <div>
+                            <label string="Import customers since" class="oe_inline"
+                                for="import_customers_since"/>
+                            <field name="import_customers_since" class="oe_inline"
+                                nolabel="1" />
+                        </div>
+                        <button name="import_customers" type="object" class="oe_highlight"
+                            string="Import in background" />
                     </group>
                     <group>
-                        <span>Import Sale Orders</span>
+                        <div>
+                            <label string="Import orders since" class="oe_inline"
+                               for="import_orders_since"/>
+                            <field name="import_orders_since" class="oe_inline"
+                                nolabel="1" />
+                        </div>
                         <button name="import_orders" type="object" class="oe_highlight"
                             string="Import in background" />
+                    </group>
+                    <group>
+                        <div>
+                            <label string="Import Carriers" class="oe_inline"
+                               for="import_carriers"/>
+                        </div>
+                        <button name="import_carriers" type="object" class="oe_highlight"
+                            string="Import in background" />
+                    </group>
+                </page>
+                <page string="Options">
+                    <group>
+                        <field name="matching_product"/>
+                        <field name="shipping_product_id"/>
+                        <field name="partner_vat_field"/>
+                        <field name="fee_product_id"/>
+                        <field name="sale_team_id"/>
                     </group>
                 </page>
             </notebook>
