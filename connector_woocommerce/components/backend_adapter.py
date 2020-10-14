@@ -91,6 +91,7 @@ class WooAPI(object):
                 consumer_secret=self._location.consumer_secret,
                 wp_api=True,
                 version="wc/v2",
+                timeout=30
             )
             self._api = api
         return self._api
