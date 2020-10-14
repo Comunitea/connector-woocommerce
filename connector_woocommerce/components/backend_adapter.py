@@ -91,6 +91,7 @@ class WooAPI(object):
                 consumer_secret=self._location.consumer_secret,
                 wp_api=True,
                 version="wc/v2",
+                timeout=30
             )
             self._api = api
         return self._api
@@ -147,11 +148,63 @@ class WooAPI(object):
             else:
                 raise
 
-    def put(self, method, arguments):
+    def put(self, method, arguments, **kwargs):
         try:
             start = datetime.now()
             try:
-                response = self.api.put(method, data=arguments)
+                response = self.api.put(method, data=arguments, **kwargs)
+                response_json = response.json()
+                if not response.ok:
+                    if response_json.get("code") and response_json.get("message"):
+                        raise FailedJobError(
+                            "%s error: %s - %s"
+                            % (
+                                response.status_code,
+                                response_json["code"],
+                                response_json["message"],
+                            )
+                        )
+                    else:
+                        return response.raise_for_status()
+                result = response_json
+            except:
+                _logger.error("api.call(%s, %s) failed", method, arguments)
+                raise
+            else:
+                _logger.debug(
+                    "api.call(%s, %s) returned %s in %s seconds",
+                    method,
+                    arguments,
+                    result,
+                    (datetime.now() - start).seconds,
+                )
+            return result
+        except (socket.gaierror, socket.error, socket.timeout) as err:
+            raise NetworkRetryableError(
+                "A network error caused the failure of the job: " "%s" % err
+            )
+        except xmlrpc.client.ProtocolError as err:
+            if err.errcode in [
+                502,  # Bad gateway
+                503,  # Service unavailable
+                504,
+            ]:  # Gateway timeout
+                raise RetryableJobError(
+                    "A protocol error caused the failure of the job:\n"
+                    "URL: %s\n"
+                    "HTTP/HTTPS headers: %s\n"
+                    "Error code: %d\n"
+                    "Error message: %s\n"
+                    % (err.url, err.headers, err.errcode, err.errmsg)
+                )
+            else:
+                raise
+
+    def post(self, method, arguments, **kwargs):
+        try:
+            start = datetime.now()
+            try:
+                response = self.api.post(method, data=arguments, **kwargs)
                 response_json = response.json()
                 if not response.ok:
                     if response_json.get("code") and response_json.get("message"):
@@ -244,7 +297,7 @@ class WooCRUDAdapter(AbstractComponent):
             )
         return wc_api.get(method, arguments)
 
-    def _put(self, method, arguments):
+    def _put(self, method, arguments, **kwargs):
         try:
             wc_api = getattr(self.work, "wc_api")
         except AttributeError:
@@ -253,7 +306,18 @@ class WooCRUDAdapter(AbstractComponent):
                 "WooAPI instance to be able to use the "
                 "Backend Adapter."
             )
-        return wc_api.put(method, arguments)
+        return wc_api.put(method, arguments, **kwargs)
+
+    def _post(self, method, arguments, **kwargs):
+        try:
+            wc_api = getattr(self.work, "wc_api")
+        except AttributeError:
+            raise AttributeError(
+                "You must provide a wc_api attribute with a "
+                "WooAPI instance to be able to use the "
+                "Backend Adapter."
+            )
+        return wc_api.post(method, arguments, **kwargs)
 
 
 class GenericAdapter(AbstractComponent):
