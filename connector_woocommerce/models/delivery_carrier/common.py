@@ -16,14 +16,6 @@ class WoocommerceDeliveryCarrier(models.Model):
         ondelete="cascade",
         oldname="openerp_id",
     )
-    backend_id = fields.Many2one(
-        comodel_name="wc.backend",
-        string="Woo Backend",
-        store=True,
-        readonly=False,
-        required=True,
-    )
-    woocommerce_id = fields.Char()
 
 
 class CarrierAdapter(Component):
@@ -42,5 +34,5 @@ class CarrierAdapter(Component):
         """
         if filters is None:
             filters = {}
-        objects = self._call(self._woo_model, filters)
+        objects = self._get(self._woo_model, filters)
         return [x["id"] for x in objects]

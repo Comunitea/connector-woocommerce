@@ -71,10 +71,10 @@ class WooBackend(models.Model):
         help="If valued only orders matching these states will be imported.",
     )
     shipping_product_id = fields.Many2one(
-        "product.template", required=True, string="Shipping Product"
+        "product.product", required=True, string="Shipping Product"
     )
     fee_product_id = fields.Many2one(
-        "product.template", required=True, string="Fees Product"
+        "product.product", required=True, string="Fees Product"
     )
     matching_product = fields.Boolean(string="Match product")
     product_qty_field = fields.Selection(

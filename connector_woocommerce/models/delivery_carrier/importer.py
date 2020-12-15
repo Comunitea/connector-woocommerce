@@ -33,7 +33,7 @@ class DeliveryCarrierImportMapper(Component):
     _inherit = "woocommerce.import.mapper"
     _apply_on = "woo.delivery.carrier"
 
-    direct = [("title", "name"), ("id", "woocommerce_id")]
+    direct = [("title", "name")]
 
     @only_create
     @mapping
