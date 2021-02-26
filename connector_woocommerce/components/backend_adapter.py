@@ -348,7 +348,7 @@ class GenericAdapter(AbstractComponent):
         while objects_data:
             filters["offset"] = readed
             objects_data = self._get(self._woo_model, filters)
-            readed += len(objects)
+            readed += len(objects_data)
             objects = objects + objects_data
         return [x["id"] for x in objects]
 
