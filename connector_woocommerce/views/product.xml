@@ -44,7 +44,7 @@
                 <field name="slug"/>
                 <field name="weight"/>
                 <field name="quantity"/>
-                <button name="recompute_woocommerce_qty"
+                <button name="recompute_woo_qty"
                     class="oe_highlight"
                     type="object"
                     string="Export quantity"/>
