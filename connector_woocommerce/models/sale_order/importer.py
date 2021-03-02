@@ -265,6 +265,34 @@ class SaleOrderImportMapper(Component):
         else:
             return {"status_id": False}
 
+    def _check_vat(self, vat_number, partner_country):
+        vat_country, vat_number_ = self.env["res.partner"]._split_vat(vat_number)
+        if not self.env["res.partner"].simple_vat_check(vat_country, vat_number_):
+            # if fails, check with country code from country
+            country_code = partner_country.code
+            if country_code:
+                if not self.env["res.partner"].simple_vat_check(
+                    country_code.lower(), vat_number
+                ):
+                    return False
+        return True
+
+    def _get_vat(self, record, country_id):
+        vat_number = None
+        if self.backend_record.order_vat_field:
+            for meta_field in record.get("meta_data"):
+                if meta_field["key"] == self.backend_record.order_vat_field:
+                    vat_number = meta_field["value"]
+
+        if vat_number:
+            vat_number = (
+                vat_number.replace(".", "").replace(" ", "").replace("-", "")
+            )
+            if self._check_vat(vat_number, country_id):
+                return vat_number
+            else:
+                return ''
+
     @mapping
     def customer_id(self, record):
         binder = self.binder_for("woo.res.partner")
@@ -293,11 +321,11 @@ class SaleOrderImportMapper(Component):
             country_id = False
             state_id = False
             if customer["country"]:
-                country_id = self.env["res.country"].search(
+                country = self.env["res.country"].search(
                     [("code", "=", customer["country"])]
                 )
-                if country_id:
-                    country_id = country_id.id
+                if country:
+                    country_id = country.id
             if customer["state"]:
                 state_id = self.env["res.country.state"].search(
                     [("code", "=", customer["state"]), ("country_id", "=", country_id)],
@@ -308,11 +336,15 @@ class SaleOrderImportMapper(Component):
             name = customer["first_name"] + " " + customer["last_name"]
             partner_dict = {
                 "name": name,
+                "street": customer["address_1"],
+                "street2": customer["address_2"],
+                "email": customer["email"],
                 "city": customer["city"],
                 "phone": customer["phone"],
                 "zip": customer["postcode"],
                 "state_id": state_id,
                 "country_id": country_id,
+                "vat": self._get_vat(record, country)
             }
             partner_id = self.env["res.partner"].create(partner_dict)
 
@@ -336,6 +368,8 @@ class SaleOrderImportMapper(Component):
             name = shipping["first_name"] + " " + shipping["last_name"]
             partner_dict = {
                 "name": name,
+                "street": shipping["address_1"],
+                "street2": shipping["address_2"],
                 "city": shipping["city"],
                 "zip": shipping["postcode"],
                 "state_id": state_id,

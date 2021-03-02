@@ -95,7 +95,8 @@ class WooBackend(models.Model):
     sale_team_id = fields.Many2one('crm.team', 'Sales Team',
         help="Sales Team assigned to the imported sales orders.",
     )
-    partner_vat_field = fields.Char("Metadata field for vat number")
+    partner_vat_field = fields.Char("Metadata field for vat number in partner")
+    order_vat_field = fields.Char("Metadata field for vat number in order")
 
     @api.multi
     def add_checkpoint(self, record, message=""):

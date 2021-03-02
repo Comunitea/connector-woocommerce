@@ -94,6 +94,7 @@
                         <field name="importable_order_state_ids" widget="many2many_tags"/>
                         <field name="shipping_product_id"/>
                         <field name="partner_vat_field"/>
+                        <field name="order_vat_field"/>
                         <field name="fee_product_id"/>
                         <field name="sale_team_id"/>
                     </group>
