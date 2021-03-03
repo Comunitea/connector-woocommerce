@@ -202,12 +202,11 @@ class SaleOrderImporter(Component):
 
     def _add_shipping_line(self, binding):
         shipping_total = binding.total_shipping_tax_excluded
-        if shipping_total:
-            if binding.odoo_id.carrier_id:
-                binding.odoo_id._create_delivery_line(
-                    binding.odoo_id.carrier_id, shipping_total
-                )
-            binding.odoo_id.recompute()
+        if binding.odoo_id.carrier_id:
+            binding.odoo_id._create_delivery_line(
+                binding.odoo_id.carrier_id, shipping_total
+            )
+        binding.odoo_id.recompute()
 
     def _add_fee_line(self, binding):
         record = self.woo_record
@@ -348,40 +347,41 @@ class SaleOrderImportMapper(Component):
             }
             partner_id = self.env["res.partner"].create(partner_dict)
 
+            result = {
+                "partner_id": partner_id.id
+            }
             # shipping
             shipping = record["shipping"]
-            country_id = False
-            state_id = False
-            if shipping["country"]:
-                country_id = self.env["res.country"].search(
-                    [("code", "=", shipping["country"])]
-                )
-                if country_id:
-                    country_id = country_id.id
-            if shipping["state"]:
-                state_id = self.env["res.country.state"].search(
-                    [("code", "=", shipping["state"]), ("country_id", "=", country_id)],
-                    limit=1,
-                )
-                if state_id:
-                    state_id = state_id.id
-            name = shipping["first_name"] + " " + shipping["last_name"]
-            partner_dict = {
-                "name": name,
-                "street": shipping["address_1"],
-                "street2": shipping["address_2"],
-                "city": shipping["city"],
-                "zip": shipping["postcode"],
-                "state_id": state_id,
-                "country_id": country_id,
-                "type": "delivery",
-                "parent_id": partner_id.id,
-            }
-            shipping_partner = self.env["res.partner"].create(partner_dict)
-            result = {
-                "partner_id": partner_id.id,
-                "shipping_partner": shipping_partner.id,
-            }
+            if shipping["address_1"]:
+                country_id = False
+                state_id = False
+                if shipping["country"]:
+                    country_id = self.env["res.country"].search(
+                        [("code", "=", shipping["country"])]
+                    )
+                    if country_id:
+                        country_id = country_id.id
+                if shipping["state"]:
+                    state_id = self.env["res.country.state"].search(
+                        [("code", "=", shipping["state"]), ("country_id", "=", country_id)],
+                        limit=1,
+                    )
+                    if state_id:
+                        state_id = state_id.id
+                name = shipping["first_name"] + " " + shipping["last_name"]
+                partner_dict = {
+                    "name": name,
+                    "street": shipping["address_1"],
+                    "street2": shipping["address_2"],
+                    "city": shipping["city"],
+                    "zip": shipping["postcode"],
+                    "state_id": state_id,
+                    "country_id": country_id,
+                    "type": "delivery",
+                    "parent_id": partner_id.id,
+                }
+                shipping_partner = self.env["res.partner"].create(partner_dict)
+                result["shipping_partner"] = shipping_partner.id
         return result
 
     @mapping
