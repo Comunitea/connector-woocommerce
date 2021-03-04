@@ -41,15 +41,17 @@ class CustomerImporter(Component):
         binder = self.binder_for("woo.res.partner")
         shipping_binding = binder.to_internal(str(self.external_id) + "_shipping")
         map_shipping = self._map_data()
-
         if shipping_binding:
             record = self._update_data(map_shipping, shipping_data=True)
-            self._update(shipping_binding, record)
+            if record['street']:
+                self._update(shipping_binding, record)
         else:
             record = self._create_data(map_shipping, shipping_data=True)
-            shipping_binding = self._create(record)
-        self.binder.bind(str(self.external_id) + "_shipping", shipping_binding)
-        self._after_import(shipping_binding)
+            if record['street']:
+                shipping_binding = self._create(record)
+        if shipping_binding:
+            self.binder.bind(str(self.external_id) + "_shipping", shipping_binding)
+            self._after_import(shipping_binding)
         return res
 
     def _check_vat(self, vat_number, partner_country):
@@ -94,10 +96,17 @@ class CustomerImportMapper(Component):
 
     @mapping
     def name(self, record):
+        if not self.options.get("shipping_data") and record['billing'].get('company'):
+            return {'name': record['billing'].get('company')}
         if record.get("first_name") or record.get("last_name"):
             return {"name": record["first_name"] + " " + record["last_name"]}
         else:
             return {"name": record.get("username")}
+
+    @mapping
+    def is_company(self, record):
+        if not self.options.get("shipping_data") and record['billing'].get('company'):
+            return {'is_company': True}
 
     @mapping
     def city(self, record):

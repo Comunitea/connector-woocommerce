@@ -307,13 +307,9 @@ class SaleOrderImportMapper(Component):
                 )
                 or False
             )
-            assert (
-                shipping_address
-            ), "Please Check Customer Role \
-                                in WooCommerce"
             result = {
                 "partner_id": partner.id,
-                "partner_shipping_id": shipping_address.id,
+                "partner_shipping_id": shipping_address and shipping_address.id or partner.id,
             }
         else:
             customer = record["billing"]
@@ -332,7 +328,12 @@ class SaleOrderImportMapper(Component):
                 )
                 if state_id:
                     state_id = state_id.id
-            name = customer["first_name"] + " " + customer["last_name"]
+            if customer['company']:
+                name = customer['company']
+                is_company = True
+            else:
+                name = customer["first_name"] + " " + customer["last_name"]
+                is_company = False
             partner_dict = {
                 "name": name,
                 "street": customer["address_1"],
@@ -343,7 +344,8 @@ class SaleOrderImportMapper(Component):
                 "zip": customer["postcode"],
                 "state_id": state_id,
                 "country_id": country_id,
-                "vat": self._get_vat(record, country)
+                "vat": self._get_vat(record, country),
+                "is_company": is_company
             }
             partner_id = self.env["res.partner"].create(partner_dict)
 
