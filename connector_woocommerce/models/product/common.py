@@ -69,7 +69,7 @@ class WooProductTemplate(models.Model):
             exporter = work.component(usage="inventory.exporter")
             return exporter.run(self, fields)
 
-    @job(default_channel="root.woocommmerce")
+    @job(default_channel="root.woocommerce")
     def export_product_quantities(self, backend=None):
         self.search([("backend_id", "=", backend.id)]).recompute_woo_qty()
 
