@@ -91,7 +91,7 @@ class ProductImageImporter(Component):
         elif response.status_code == 400:
             return
         else:
-            raise
+            raise Exception(response.status_code)
 
     def _write_image_data(self, binding, binary, image_data):
         binding = binding.with_context(connector_no_export=True)

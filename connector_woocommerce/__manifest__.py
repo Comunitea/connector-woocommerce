@@ -8,7 +8,7 @@
     "author": "Tech Receptives,FactorLibre,Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "website": "http://www.openerp.com",
-    "depends": ["connector", "sale_stock", "connector_ecommerce"],
+    "depends": ["connector", "sale_stock", "connector_ecommerce", "product_multi_category"],
     "installable": True,
     "auto_install": False,
     "data": [
