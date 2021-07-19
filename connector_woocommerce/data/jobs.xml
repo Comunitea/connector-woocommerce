@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="channel_woocommerce" model="queue.job.channel">
+        <field name="name">sale</field>
+        <field name="parent_id" ref="queue_job.channel_root" />
+    </record>
+
+    <record id="job_function_woo_product_template_export_inventory" model="queue.job.function">
+        <field name="model_id" ref="connector_woocommerce.model_woo_product_template" />
+        <field name="method">export_inventory</field>
+        <field name="channel_id" ref="channel_woocommerce" />
+    </record>
+
+    <record id="job_function_woo_product_template_export_product_quantities" model="queue.job.function">
+        <field name="model_id" ref="connector_woocommerce.model_woo_product_template" />
+        <field name="method">export_product_quantities</field>
+        <field name="channel_id" ref="channel_woocommerce" />
+    </record>
+
+    <record id="job_function_woo_binding_import_batch" model="queue.job.function">
+        <field name="model_id" ref="connector_woocommerce.model_woo_binding" />
+        <field name="method">import_batch</field>
+        <field name="channel_id" ref="channel_woocommerce" />
+    </record>
+
+    <record id="job_function_woo_binding_import_record" model="queue.job.function">
+        <field name="model_id" ref="connector_woocommerce.model_woo_binding" />
+        <field name="method">import_record</field>
+        <field name="channel_id" ref="channel_woocommerce" />
+    </record>
+
+    <record id="job_function_woo_binding_export_record" model="queue.job.function">
+        <field name="model_id" ref="connector_woocommerce.model_woo_binding" />
+        <field name="method">export_record</field>
+        <field name="channel_id" ref="channel_woocommerce" />
+        <field name="related_action" eval='{"func_name": "related_action_unwrap_binding"}' />
+    </record>
+    <record id="job_function_woo_binding_export_delete_record" model="queue.job.function">
+        <field name="model_id" ref="connector_woocommerce.model_woo_binding" />
+        <field name="method">export_delete_record</field>
+        <field name="channel_id" ref="channel_woocommerce" />
+    </record>
+
+</odoo>

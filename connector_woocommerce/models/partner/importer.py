@@ -84,7 +84,7 @@ class CustomerImporter(Component):
                 else:
                     binding.write({"woo_vatnumber": vat_number})
                     msg = _("Please, check the VAT number: %s") % vat_number
-                    self.backend_record.add_checkpoint(binding, message=msg)
+                    self.backend_record.activity_schedule('mail.mail_activity_data_warning', summary=_('VAT number error'), note=msg)
 
 
 class CustomerImportMapper(Component):

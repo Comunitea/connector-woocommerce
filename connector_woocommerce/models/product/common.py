@@ -6,7 +6,6 @@ import logging
 
 from collections import defaultdict
 from odoo import api, models, fields
-from odoo.addons.queue_job.job import job
 from odoo.addons.component.core import Component
 from odoo.addons.component_event import skip_if
 
@@ -20,12 +19,6 @@ class ProductTemplate(models.Model):
         "woo.product.template", "odoo_id", "Woocommerce Bindings"
     )
 
-    def write(self, vals):
-        if vals.get("image"):
-            vals["image_main"] = vals["image"]
-        return super().write(vals)
-
-    @api.multi
     def update_woo_qty(self):
         for product in self:
             for woo_product in product.woo_bind_ids:
@@ -61,7 +54,6 @@ class WooProductTemplate(models.Model):
         help="Last computed quantity to send to Woocommerce.",
     )
 
-    @job(default_channel="root.woocommerce")
     def export_inventory(self, fields=None):
         """ Export the inventory configuration and quantity of a product. """
         backend = self.backend_id
@@ -69,11 +61,9 @@ class WooProductTemplate(models.Model):
             exporter = work.component(usage="inventory.exporter")
             return exporter.run(self, fields)
 
-    @job(default_channel="root.woocommerce")
     def export_product_quantities(self, backend=None):
         self.search([("backend_id", "=", backend.id)]).recompute_woo_qty()
 
-    @api.multi
     def recompute_woo_qty(self):
         # group products by backend
         backends = defaultdict(set)
@@ -85,7 +75,6 @@ class WooProductTemplate(models.Model):
             products._recompute_woo_qty_backend(backend)
         return True
 
-    @api.multi
     def _recompute_woo_qty_backend(self, backend):
         locations = backend._get_locations_for_stock_quantities()
         self_loc = self.with_context(location=locations.ids, compute_child=False)

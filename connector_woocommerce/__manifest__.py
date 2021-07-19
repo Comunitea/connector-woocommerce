@@ -8,7 +8,7 @@
     "author": "Tech Receptives,FactorLibre,Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "website": "http://www.openerp.com",
-    "depends": ["connector", "sale_stock", "connector_ecommerce", "product_multi_category"],
+    "depends": ["connector", "connector_ecommerce", "product_multi_category", "account_payment_sale"],
     "installable": True,
     "auto_install": False,
     "data": [
@@ -16,11 +16,11 @@
         "views/backend_view.xml",
         "views/account_payment_mode.xml",
         "views/sale.xml",
-        "views/stock_location.xml",
         "views/product.xml",
         "views/res_partner.xml",
         "data/ir_cron.xml",
         "data/exception_rule.xml",
+        "data/jobs.xml"
     ],
     "external_dependencies": {"python": ["woocommerce"]},
     "application": True,

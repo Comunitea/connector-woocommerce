@@ -14,7 +14,6 @@ class StockQuant(models.Model):
             quant.product_tmpl_id.update_woo_qty()
         return quant
 
-    @api.multi
     def write(self, vals):
         location_obj = self.env["stock.location"]
         ps_locations = location_obj.get_woocommerce_stock_locations()
@@ -26,7 +25,6 @@ class StockQuant(models.Model):
                 quant.product_tmpl_id.update_woo_qty()
         return True
 
-    @api.multi
     def unlink(self):
         ps_locations = self.env["stock.location"].get_woocommerce_stock_locations()
         self.filtered(lambda x: x.location_id in ps_locations).mapped(

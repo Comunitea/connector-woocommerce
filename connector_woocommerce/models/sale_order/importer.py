@@ -229,7 +229,7 @@ class SaleOrderImporter(Component):
 
     def _after_import(self, binding):
         super(SaleOrderImporter, self)._after_import(binding)
-        self._add_shipping_line(binding)
+        # self._add_shipping_line(binding)
         self._add_fee_line(binding)
 
 

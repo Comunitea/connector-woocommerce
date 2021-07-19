@@ -4,7 +4,6 @@
 import logging
 
 from contextlib import contextmanager
-from odoo.addons.connector.models import checkpoint
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from ...components.backend_adapter import WooLocation, WooAPI
@@ -40,18 +39,6 @@ class WooBackend(models.Model):
     consumer_secret = fields.Char("Consumer Secret")
     version = fields.Selection(selection="select_versions", required=True)
     verify_ssl = fields.Boolean("Verify SSL")
-    warehouse_id = fields.Many2one(
-        comodel_name="stock.warehouse",
-        string="Warehouse",
-        required=True,
-        help="Warehouse used to compute the " "stock quantities.",
-    )
-    company_id = fields.Many2one(
-        comodel_name="res.company",
-        related="warehouse_id.company_id",
-        string="Company",
-        readonly=True,
-    )
     default_lang_id = fields.Many2one(
         comodel_name="res.lang",
         string="Default Language",
@@ -87,31 +74,11 @@ class WooBackend(models.Model):
         default="qty_available",
         required=True,
     )
-    stock_location_id = fields.Many2one(
-        comodel_name="stock.location",
-        string="Stock Location",
-        help="Location used to import stock quantities.",
-    )
     sale_team_id = fields.Many2one('crm.team', 'Sales Team',
         help="Sales Team assigned to the imported sales orders.",
     )
     partner_vat_field = fields.Char("Metadata field for vat number in partner")
     order_vat_field = fields.Char("Metadata field for vat number in order")
-
-    @api.multi
-    def add_checkpoint(self, record, message=""):
-        """
-        @param message: used with this
-        https://github.com/OCA/connector/issues/37
-        """
-        self.ensure_one()
-        record.ensure_one()
-        chk_point = checkpoint.add_checkpoint(
-            self.env, record._name, record.id, self._name, self.id
-        )
-        if message:
-            chk_point.message_post(body=message)
-        return chk_point
 
     @api.constrains("product_qty_field")
     def check_product_qty_field_dependencies_installed(self):
@@ -135,33 +102,7 @@ class WooBackend(models.Model):
                         )
                     )
 
-    @api.multi
-    def _get_locations_for_stock_quantities(self):
-        root_location = self.stock_location_id or self.warehouse_id.lot_stock_id
-        locations = self.env["stock.location"].search(
-            [
-                ("id", "child_of", root_location.id),
-                ("woo_synchronized", "=", True),
-                ("usage", "=", "internal"),
-            ]
-        )
-        # if we choosed a location but none where flagged
-        # 'woo_synchronized', consider we want all of them in the tree
-        if not locations:
-            locations = self.env["stock.location"].search(
-                [("id", "child_of", root_location.id), ("usage", "=", "internal")]
-            )
-        if not locations:
-            # we must not pass an empty location or we would have the
-            # stock for every warehouse, which is the last thing we
-            # expect
-            raise UserError(
-                _("No internal location found to compute the product " "quantity.")
-            )
-        return locations
-
     @contextmanager
-    @api.multi
     def work_on(self, model_name, **kwargs):
         self.ensure_one()
         # lang = self.default_lang_id
@@ -180,35 +121,34 @@ class WooBackend(models.Model):
         with _super.work_on(model_name, wc_api=wc_api, **kwargs) as work:
             yield work
 
-    @api.multi
     def get_product_ids(self, data):
         product_ids = [x["id"] for x in data["products"]]
         product_ids = sorted(product_ids)
         return product_ids
 
-    @api.multi
+
     def get_product_category_ids(self, data):
         product_category_ids = [x["id"] for x in data["product_categories"]]
         product_category_ids = sorted(product_category_ids)
         return product_category_ids
 
-    @api.multi
+
     def get_customer_ids(self, data):
         customer_ids = [x["id"] for x in data["customers"]]
         customer_ids = sorted(customer_ids)
         return customer_ids
 
-    @api.multi
+
     def get_order_ids(self, data):
         order_ids = self.check_existing_order(data)
         return order_ids
 
-    @api.multi
+
     def update_existing_order(self, woo_sale_order, data):
         """ Enter Your logic for Existing Sale Order """
         return True
 
-    @api.multi
+
     def check_existing_order(self, data):
         order_ids = []
         for val in data["orders"]:
@@ -221,7 +161,7 @@ class WooBackend(models.Model):
             order_ids.append(val["id"])
         return order_ids
 
-    @api.multi
+
     def test_connection(self):
         location = self.location
         cons_key = self.consumer_key
@@ -246,7 +186,7 @@ class WooBackend(models.Model):
             raise UserError(_("Test Success"))
         return True
 
-    @api.multi
+
     def import_categories(self):
         for backend in self:
             since_date = backend.import_product_categories_since
@@ -256,7 +196,7 @@ class WooBackend(models.Model):
             backend.import_product_categories_since = fields.Datetime.now()
         return True
 
-    @api.multi
+
     def import_products(self):
         for backend in self:
             since_date = backend.import_products_since
@@ -266,7 +206,7 @@ class WooBackend(models.Model):
             backend.import_products_since = fields.Datetime.now()
         return True
 
-    @api.multi
+
     def import_customers(self):
         for backend in self:
             since_date = backend.import_customers_since
@@ -276,7 +216,7 @@ class WooBackend(models.Model):
             backend.import_customers_since = fields.Datetime.now()
         return True
 
-    @api.multi
+
     def import_orders(self):
         for backend in self:
             since_date = backend.import_orders_since
@@ -286,7 +226,7 @@ class WooBackend(models.Model):
             backend.import_orders_since = fields.Datetime.now()
         return True
 
-    @api.multi
+
     def import_carriers(self):
         for backend in self:
             self.env["woo.delivery.carrier"].with_delay().import_batch(backend)

@@ -5,6 +5,3 @@ from . import product_category
 from . import product
 from . import sale_order
 from . import account_payment_mode
-from . import delivery_carrier
-from . import stock_location
-from . import stock_quant
