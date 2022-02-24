@@ -377,6 +377,7 @@ class SaleOrderImportMapper(Component):
                     "street2": shipping["address_2"],
                     "city": shipping["city"],
                     "zip": shipping["postcode"],
+                    "phone": shipping.get("phone"),
                     "state_id": state_id,
                     "country_id": country_id,
                     "type": "delivery",
