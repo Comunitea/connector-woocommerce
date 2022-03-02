@@ -101,7 +101,7 @@ class ProductImageImporter(Component):
         images = woo_record["images"]
         binary = None
         while not binary and images:
-            image_data = images.pop()
+            image_data = images.pop(0)
             binary = self._get_binary_image(image_data)
         if not binary:
             return
