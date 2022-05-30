@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import logging
 from odoo import _
+from odoo.exceptions import ValidationError
 from datetime import datetime, timedelta
 from odoo.addons.component.core import Component
 from odoo.addons.connector.components.mapper import mapping
@@ -436,8 +437,9 @@ class SaleOrderLineImportMapper(Component):
     def product_id(self, record):
         binder = self.binder_for("woo.product.template")
         product = binder.to_internal(record["product_id"], unwrap=True)
-        assert product is not None, (
-            "product_id %s should have been imported in "
-            "SaleOrderImporter._import_dependencies" % record["product_id"]
-        )
+        if not product:
+            raise ValidationError(
+                "product_id %s should have been imported in "
+                "SaleOrderImporter._import_dependencies" % record["product_id"]
+            )
         return {"product_id": product.product_variant_ids.id}
