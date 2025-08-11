@@ -100,16 +100,10 @@ class WooAPI(object):
     def _get_headers(self):
         usuario_woocommerce = self._location.consumer_key
         clave_woocommerce = self._location.consumer_secret
-        url = self.env['ir.config_parameter'].sudo().get_param(
-            'rumar_pricing_module.woocommerce_api_url',
-            default='https://rumar.gueb.pro/wp-json/cl-woo-custom-pricing/v1/prices'
-        )
         headers = {
             "Accept": "application/json, text/plain, */*",
             "Content-Type": "application/json;charset=utf-8",
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-            "Origin": url.split('/wp-json')[0],
-            "Referer": url.split('/wp-json')[0]
         }
 
         # Intentar con autenticación básica directamente en los headers
