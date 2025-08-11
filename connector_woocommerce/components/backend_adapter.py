@@ -1,7 +1,6 @@
 # © 2009 Tech-Receptives Solutions Pvt. Ltd.
 # © 2018 FactorLibre
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-import base64
 import socket
 import logging
 import xmlrpc.client
@@ -97,24 +96,9 @@ class WooAPI(object):
             self._api = api
         return self._api
 
-    def _get_headers(self):
-        usuario_woocommerce = self._location.consumer_key
-        clave_woocommerce = self._location.consumer_secret
-        headers = {
-            "Accept": "application/json, text/plain, */*",
-            "Content-Type": "application/json;charset=utf-8",
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        }
-
-        # Intentar con autenticación básica directamente en los headers
-        auth_string = f"{usuario_woocommerce}:{clave_woocommerce}"
-        auth_header = base64.b64encode(auth_string.encode()).decode('utf-8')
-        headers["Authorization"] = f"Basic {auth_header}"
-
     def get(self, method, arguments):
         try:
             start = datetime.now()
-            arguments["headers"] = self._get_headers()
             try:
                 response = self.api.get(method, params=arguments)
                 response_json = response.json()
@@ -167,7 +151,6 @@ class WooAPI(object):
     def put(self, method, arguments, **kwargs):
         try:
             start = datetime.now()
-            kwargs["headers"] = self._get_headers()
             try:
                 response = self.api.put(method, data=arguments, **kwargs)
                 response_json = response.json()
@@ -220,7 +203,6 @@ class WooAPI(object):
     def post(self, method, arguments, **kwargs):
         try:
             start = datetime.now()
-            kwargs["headers"] = self._get_headers()
             try:
                 response = self.api.post(method, data=arguments, **kwargs)
                 response_json = response.json()
