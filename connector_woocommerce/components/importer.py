@@ -7,7 +7,7 @@ from datetime import datetime
 from odoo import fields, _
 from odoo.addons.component.core import AbstractComponent
 from odoo.addons.connector.exception import IDMissingInBackend
-from odoo.addons.queue_job.exception import NothingToDoJob
+from odoo.addons.queue_job.exception import RetryableJobError
 from odoo.addons.connector_woocommerce.components.backend_adapter import (
     WOO_DATETIME_FORMAT,
 )
@@ -97,7 +97,7 @@ class WooImporter(AbstractComponent):
                 )
             try:
                 importer.run(external_id)
-            except NothingToDoJob:
+            except RetryableJobError:
                 _logger.info(
                     "Dependency import of %s(%s) has been ignored.",
                     binding_model._name,
