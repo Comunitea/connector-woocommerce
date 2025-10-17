@@ -4,7 +4,6 @@
 import logging
 
 from contextlib import contextmanager
-from odoo.addons.connector.models import checkpoint
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from ...components.backend_adapter import WooLocation, WooAPI
@@ -97,20 +96,6 @@ class WooBackend(models.Model):
     )
     partner_vat_field = fields.Char("Metadata field for vat number in partner")
     order_vat_field = fields.Char("Metadata field for vat number in order")
-
-    def add_checkpoint(self, record, message=""):
-        """
-        @param message: used with this
-        https://github.com/OCA/connector/issues/37
-        """
-        self.ensure_one()
-        record.ensure_one()
-        chk_point = checkpoint.add_checkpoint(
-            self.env, record._name, record.id, self._name, self.id
-        )
-        if message:
-            chk_point.message_post(body=message)
-        return chk_point
 
     @api.constrains("product_qty_field")
     def check_product_qty_field_dependencies_installed(self):
