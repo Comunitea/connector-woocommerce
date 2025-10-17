@@ -7,7 +7,7 @@ from odoo.exceptions import ValidationError
 from datetime import datetime, timedelta
 from odoo.addons.component.core import Component
 from odoo.addons.connector.components.mapper import mapping
-from odoo.addons.queue_job.exception import FailedJobError, NothingToDoJob
+from odoo.addons.queue_job.exception import FailedJobError
 from odoo.addons.connector_woocommerce.components.backend_adapter import (
     WOO_DATETIME_FORMAT,
 )
@@ -95,7 +95,7 @@ class SaleImportRule(Component):
             return
         order_date = datetime.strptime(record["date_created"], WOO_DATETIME_FORMAT)
         if order_date + timedelta(days=max_days) < datetime.now():
-            raise NothingToDoJob(
+            raise Exception(
                 "Import of the order %s canceled "
                 "because it has not been paid since %d "
                 "days" % (order_id, max_days)
@@ -126,7 +126,7 @@ class SaleImportRule(Component):
                     % (woo_state_name,)
                 )
             if state not in self.backend_record.importable_order_state_ids:
-                raise NothingToDoJob(
+                raise Exception(
                     _(
                         "Import of the order with PS ID=%s canceled "
                         "because its state is not importable"
@@ -162,7 +162,7 @@ class SaleOrderImporter(Component):
         rules = self.component(usage="sale.import.rule")
         try:
             return rules.check(self.woo_record)
-        except NothingToDoJob as err:
+        except Exception as err:
             # we don't let the NothingToDoJob exception let go out, because if
             # we are in a cascaded import, it would stop the whole
             # synchronization and set the whole job to done
