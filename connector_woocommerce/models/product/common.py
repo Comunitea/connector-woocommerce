@@ -6,7 +6,6 @@ import logging
 
 from collections import defaultdict
 from odoo import api, models, fields
-from odoo.addons.queue_job.job import job
 from odoo.addons.component.core import Component
 from odoo.addons.component_event import skip_if
 
@@ -61,7 +60,6 @@ class WooProductTemplate(models.Model):
         help="Last computed quantity to send to Woocommerce.",
     )
 
-    @job(default_channel="root.woocommerce")
     def export_inventory(self, fields=None):
         """ Export the inventory configuration and quantity of a product. """
         backend = self.backend_id
@@ -69,7 +67,6 @@ class WooProductTemplate(models.Model):
             exporter = work.component(usage="inventory.exporter")
             return exporter.run(self, fields)
 
-    @job(default_channel="root.woocommerce")
     def export_product_quantities(self, backend=None):
         self.search([("backend_id", "=", backend.id)]).recompute_woo_qty()
 

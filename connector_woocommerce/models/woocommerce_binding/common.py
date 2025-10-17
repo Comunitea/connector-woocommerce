@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, models, fields
-from odoo.addons.queue_job.job import job, related_action
+from odoo.addons.queue_job.job import related_action
 
 
 class WooBinding(models.AbstractModel):
@@ -37,7 +37,6 @@ class WooBinding(models.AbstractModel):
         )
     ]
 
-    @job(default_channel="root.woocommerce")
     @api.model
     def import_batch(self, backend, filters=None):
         """ Prepare the import of records modified on  Woocommerce"""
@@ -47,7 +46,6 @@ class WooBinding(models.AbstractModel):
             importer = work.component(usage="batch.importer")
             return importer.run(filters=filters)
 
-    @job(default_channel="root.woocommerce")
     @api.model
     def import_record(self, backend, external_id, force=False):
         """ Import a Woocommerce record """
@@ -55,8 +53,6 @@ class WooBinding(models.AbstractModel):
             importer = work.component(usage="record.importer")
             return importer.run(external_id, force=force)
 
-    @job(default_channel="root.woocommerce")
-    @related_action(action="related_action_unwrap_binding")
     @api.multi
     def export_record(self, fields=None):
         """ Export a record on Woocommerce """
@@ -65,7 +61,6 @@ class WooBinding(models.AbstractModel):
             exporter = work.component(usage="record.exporter")
             return exporter.run(self, fields)
 
-    @job(default_channel="root.woocommerce")
     def export_delete_record(self, backend, external_id):
         """ Delete a record on Woocommerce """
         with backend.work_on(self._name) as work:
