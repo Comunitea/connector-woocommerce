@@ -98,7 +98,6 @@ class WooBackend(models.Model):
     partner_vat_field = fields.Char("Metadata field for vat number in partner")
     order_vat_field = fields.Char("Metadata field for vat number in order")
 
-    @api.multi
     def add_checkpoint(self, record, message=""):
         """
         @param message: used with this
@@ -135,7 +134,6 @@ class WooBackend(models.Model):
                         )
                     )
 
-    @api.multi
     def _get_locations_for_stock_quantities(self):
         root_location = self.stock_location_id or self.warehouse_id.lot_stock_id
         locations = self.env["stock.location"].search(
@@ -161,7 +159,6 @@ class WooBackend(models.Model):
         return locations
 
     @contextmanager
-    @api.multi
     def work_on(self, model_name, **kwargs):
         self.ensure_one()
         # lang = self.default_lang_id
@@ -180,35 +177,29 @@ class WooBackend(models.Model):
         with _super.work_on(model_name, wc_api=wc_api, **kwargs) as work:
             yield work
 
-    @api.multi
     def get_product_ids(self, data):
         product_ids = [x["id"] for x in data["products"]]
         product_ids = sorted(product_ids)
         return product_ids
 
-    @api.multi
     def get_product_category_ids(self, data):
         product_category_ids = [x["id"] for x in data["product_categories"]]
         product_category_ids = sorted(product_category_ids)
         return product_category_ids
 
-    @api.multi
     def get_customer_ids(self, data):
         customer_ids = [x["id"] for x in data["customers"]]
         customer_ids = sorted(customer_ids)
         return customer_ids
 
-    @api.multi
     def get_order_ids(self, data):
         order_ids = self.check_existing_order(data)
         return order_ids
 
-    @api.multi
     def update_existing_order(self, woo_sale_order, data):
         """ Enter Your logic for Existing Sale Order """
         return True
 
-    @api.multi
     def check_existing_order(self, data):
         order_ids = []
         for val in data["orders"]:
@@ -221,7 +212,6 @@ class WooBackend(models.Model):
             order_ids.append(val["id"])
         return order_ids
 
-    @api.multi
     def test_connection(self):
         location = self.location
         cons_key = self.consumer_key
@@ -246,7 +236,6 @@ class WooBackend(models.Model):
             raise UserError(_("Test Success"))
         return True
 
-    @api.multi
     def import_categories(self):
         for backend in self:
             since_date = backend.import_product_categories_since
@@ -256,7 +245,6 @@ class WooBackend(models.Model):
             backend.import_product_categories_since = fields.Datetime.now()
         return True
 
-    @api.multi
     def import_products(self):
         for backend in self:
             since_date = backend.import_products_since
@@ -266,7 +254,6 @@ class WooBackend(models.Model):
             backend.import_products_since = fields.Datetime.now()
         return True
 
-    @api.multi
     def import_customers(self):
         for backend in self:
             since_date = backend.import_customers_since
@@ -276,7 +263,6 @@ class WooBackend(models.Model):
             backend.import_customers_since = fields.Datetime.now()
         return True
 
-    @api.multi
     def import_orders(self):
         for backend in self:
             since_date = backend.import_orders_since
@@ -286,7 +272,6 @@ class WooBackend(models.Model):
             backend.import_orders_since = fields.Datetime.now()
         return True
 
-    @api.multi
     def import_carriers(self):
         for backend in self:
             self.env["woo.delivery.carrier"].with_delay().import_batch(backend)

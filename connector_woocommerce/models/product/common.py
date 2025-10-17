@@ -24,7 +24,6 @@ class ProductTemplate(models.Model):
             vals["image_main"] = vals["image"]
         return super().write(vals)
 
-    @api.multi
     def update_woo_qty(self):
         for product in self:
             for woo_product in product.woo_bind_ids:
@@ -70,7 +69,6 @@ class WooProductTemplate(models.Model):
     def export_product_quantities(self, backend=None):
         self.search([("backend_id", "=", backend.id)]).recompute_woo_qty()
 
-    @api.multi
     def recompute_woo_qty(self):
         # group products by backend
         backends = defaultdict(set)
@@ -82,7 +80,6 @@ class WooProductTemplate(models.Model):
             products._recompute_woo_qty_backend(backend)
         return True
 
-    @api.multi
     def _recompute_woo_qty_backend(self, backend):
         locations = backend._get_locations_for_stock_quantities()
         self_loc = self.with_context(location=locations.ids, compute_child=False)

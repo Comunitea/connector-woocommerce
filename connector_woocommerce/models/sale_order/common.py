@@ -98,11 +98,12 @@ class WooSaleOrderLine(models.Model):
         required=False,
     )
 
-    @api.model
-    def create(self, vals):
-        woo_order_id = vals["woo_order_id"]
-        binding = self.env["woo.sale.order"].browse(woo_order_id)
-        vals["order_id"] = binding.odoo_id.id
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            woo_order_id = vals["woo_order_id"]
+            binding = self.env["woo.sale.order"].browse(woo_order_id)
+            vals["order_id"] = binding.odoo_id.id
         binding = super(WooSaleOrderLine, self).create(vals)
         return binding
 

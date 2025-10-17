@@ -52,7 +52,6 @@ class WooBinding(models.AbstractModel):
             importer = work.component(usage="record.importer")
             return importer.run(external_id, force=force)
 
-    @api.multi
     def export_record(self, fields=None):
         """ Export a record on Woocommerce """
         self.ensure_one()
@@ -66,7 +65,6 @@ class WooBinding(models.AbstractModel):
             deleter = work.component(usage="record.exporter.deleter")
             return deleter.run(external_id)
 
-    @api.multi
     def resync(self):
         func = self.import_record
         if self.env.context.get("connector_delay"):
