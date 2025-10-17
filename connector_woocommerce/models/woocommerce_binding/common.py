@@ -3,7 +3,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, models, fields
-from odoo.addons.queue_job.job import related_action
 
 
 class WooBinding(models.AbstractModel):
