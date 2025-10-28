@@ -4,7 +4,7 @@
     <record id="view_order_connector_woocommerce_form" model="ir.ui.view">
         <field name="name">sale.order.connector.woocommerce.form</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="connector_ecommerce.view_order_connector_form" />
+        <field name="inherit_id" ref="connector_ecommerce.sale_order_view_form" />
         <field name="arch" type="xml">
 
            <page name="connector" position="attributes">
