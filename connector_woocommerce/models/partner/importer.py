@@ -83,8 +83,9 @@ class CustomerImporter(Component):
                     binding.write({"vat": vat_number, "woo_vatnumber": vat_number})
                 else:
                     binding.write({"woo_vatnumber": vat_number})
-                    msg = _("Please, check the VAT number: %s") % vat_number
-                    self.backend_record.add_checkpoint(binding, message=msg)
+                    binding.odoo_id.message_post(
+                        body=_("Invalid VAT number: %s") % vat_number
+                    )
 
 
 class CustomerImportMapper(Component):
