@@ -132,7 +132,7 @@ class ProductProductImportMapper(Component):
     @mapping
     def type(self, record):
         if record["type"] == "simple":
-            return {"type": "product"}
+            return {"type": "consu"}
 
     @mapping
     def categories(self, record):
