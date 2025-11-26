@@ -207,7 +207,6 @@ class SaleOrderImporter(Component):
             binding.odoo_id._create_delivery_line(
                 binding.odoo_id.carrier_id, shipping_total
             )
-        binding.odoo_id.recompute()
 
     def _add_fee_line(self, binding):
         record = self.woo_record
@@ -226,7 +225,6 @@ class SaleOrderImporter(Component):
             if binding.odoo_id.order_line:
                 values["sequence"] = binding.odoo_id.order_line[-1].sequence + 1
             self.env["sale.order.line"].sudo().create(values)
-        binding.odoo_id.recompute()
 
     def _after_import(self, binding):
         super(SaleOrderImporter, self)._after_import(binding)
