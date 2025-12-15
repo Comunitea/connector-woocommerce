@@ -70,6 +70,18 @@ class WooSaleOrder(models.Model):
         readonly=True,
     )
 
+    def create(self, vals):
+        woo_order_line_ids = False
+        if vals.get('woo_order_line_ids'):
+           woo_order_line_ids = vals.pop('woo_order_line_ids')
+        binding = super(WooSaleOrder, self).create(vals)
+        if woo_order_line_ids:
+            for line in woo_order_line_ids:
+                line_vals = line[2]
+                line_vals['woo_order_id'] = int(binding.id)
+                self.env['woo.sale.order.line'].create(line_vals)
+        return binding
+
 
 class WooSaleOrderLine(models.Model):
     _name = "woo.sale.order.line"
