@@ -95,7 +95,7 @@ class ProductImageImporter(Component):
 
     def _write_image_data(self, binding, binary, image_data):
         binding = binding.with_context(connector_no_export=True)
-        binding.write({"image": base64.b64encode(binary)})
+        binding.write({"image_1920": base64.b64encode(binary)})
 
     def run(self, woo_record, binding):
         images = woo_record["images"]
